@@ -1,0 +1,7 @@
+# Ignora file di backup o file non necessari
+_index.html
+ex-index.html
+
+# Ignora file di sistema o temporanei (opzionale)
+.DS_Store
+*.log
