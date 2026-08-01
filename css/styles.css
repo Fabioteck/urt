@@ -107,6 +107,7 @@
       display: none; /* mobile-first: nascosti, visibili da desktop */
       list-style: none;
       gap: 2.5rem;
+      align-items: center;
     }
 
     .nav-links a {
