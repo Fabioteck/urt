@@ -1,58 +1,73 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# U.R.T. — Underground Remind Tek Platform
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Benvenuto nella repository ufficiale di **U.R.T. (Underground Remind Tek)**, un collettivo sonoro (*Sonic Collective*) fondato nel **2024** e composto da musicisti, producer, DJ e tecnici del suono dedicati alla cultura underground e alla musica tekno.
 
-## About Laravel
+Questo progetto nasce dall'esigenza di effettuare un porting completo da un sito web statico in HTML/CSS a una **Web Application dinamica, modulare e scalabile**, sviluppata interamente in ambiente di produzione via SSH. L'intero codice è rilasciato in modalità aperta per supportare lo sviluppo e la condivisione all'interno della scena underground.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🛠️ Stack Tecnico & Architettura
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+L'infrastruttura è stata ingegnerizzata per essere estremamente leggera, veloce da mantenere e ottimizzata per la visualizzazione immediata da dispositivi mobile, riducendo al minimo il consumo di risorse sul server.
 
-## Learning Laravel
+*   **Framework Backend:** Laravel 12 / 13 (Struttura nativa senza API esterne)
+*   **Linguaggio:** PHP 8.3 / 8.4
+*   **Database:** SQLite (Engine snello basato su file, ideale per transazioni rapide e zero overhead di memoria)
+*   **Web Server:** Apache con modulo `mod_php` e `mod_rewrite` attivo per l'ottimizzazione dei percorsi interni
+*   **Motore di Validazione & Auth:** Laravel Breeze (Riscritto interamente con estensione Blade nativa)
+*   **Frontend & Styling:** Tailwind CSS & Vite (Compilazione asset Rolldown in produzione)
+*   **Identità Visiva:** Tema *Total Dark Underground* (bg-black, text-zinc, accenti rosso/monocromatico) ed effetto canvas interattivo a particelle fluttuanti nell'Hero.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 📦 Moduli & Funzionalità Sviluppate
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+L'applicazione è strutturata in modo modulare per consentire futuri inserimenti di servizi (es. playlist audio o download multimediali) senza dover riscrivere il core del codice.
 
-## Agentic Development
+### 1. Area Pubblica (Frontend Dinamico)
+*   **Home, Artisti, News:** Interfacce collegate direttamente alle tabelle del database tramite Eloquent ORM.
+*   **SEO & Routing Pulito:** Utilizzo esclusivo di `slug` e chiavi testuali univoche negli URL pubblici (`/artisti/{slug}`, `/news/{slug}`). Gli ID numerici incrementali del database non vengono mai esposti all'utente.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### 2. Area Amministrativa (Pannello CRUD Protetto)
+*   **Autenticazione Sicura:** Gestione degli accessi, sessioni e protezione delle rotte tramite i middleware nativi di Laravel Breeze, allineati al database in modalità *file session*.
+*   **CRUD Artisti & News:** Interfacce di gestione complete per l'inserimento, la modifica e la rimozione fisica dei record dal database SQLite.
+*   **Gestione Pagine Statiche (Progetto & Contatti):** Integrazione dell'editor visuale WYSIWYG **Quill.js** con switch in tempo reale per la visualizzazione del codice HTML grezzo, permettendo la formattazione avanzata dei testi direttamente da smartphone.
+*   **Motore di Upload Centralizzato (MediaController):** Modulo isolato per il caricamento di file sul disco pubblico di sistema (`public/storage`). Prevede una validazione rigida con limite massimo a **2 MB** per garantire alte performance su reti mobili e supporta estensioni multimediali (immagini) e documentali (PDF).
+
+---
+
+## ⚡ Installazione & Configurazione Rapida
+
+Se desideri clonare il progetto in locale o eseguire il deploy su un altro server Linux, segui questi passaggi da terminale:
 
 ```bash
-composer require laravel/boost --dev
+# 1. Clona il repository e installa le dipendenze
+git clone https://github.com
+cd urt
+composer install
+npm install && npm run build
 
-php artisan boost:install
+# 2. Configura l'ambiente
+cp .env.example .env
+php artisan key:generate
+
+# 3. Inizializza il Database SQLite
+touch database/database.sqlite
+php artisan migrate:fresh --seed
+
+# 4. Collega lo storage multimediale
+php artisan storage:link
+
+# 5. Ottimizza la cache di produzione
+php artisan optimize
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### Note sui Permessi (Ambiente Apache Linux)
+Per garantire il corretto funzionamento dei form e dell'upload dei file in produzione con SQLite, assicurati che l'utente del server web (`www-data`) abbia i diritti di scrittura sulle cartelle critiche:
+```bash
+sudo chown -R www-data:www-data /var/www/html/urt
+sudo chmod -R 775 storage bootstrap/cache database
+```
 
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+*U.R.T. — Sound System Culture & Independent Electronic Music Collective — Est. 2024*

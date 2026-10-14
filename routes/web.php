@@ -6,6 +6,8 @@ use App\Http\Controllers\NewsController;
 use App\Http\Controllers\StaticPageController;
 use App\Http\Controllers\Admin\AdminArtistController;
 use App\Http\Controllers\Admin\AdminNewsController;
+use App\Http\Controllers\Admin\AdminPageController;
+use App\Http\Controllers\Admin\MediaUploadController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
@@ -22,8 +24,10 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
         return view('admin.dashboard');
     })->name('dashboard');
 
+    Route::post('/media/upload', [MediaUploadController::class, 'upload'])->name('media.upload');
     Route::resource('artists', AdminArtistController::class);
     Route::resource('news', AdminNewsController::class);
+    Route::resource('pages', AdminPageController::class)->only(['index', 'edit', 'update']);
 });
 
 require __DIR__.'/auth.php';
