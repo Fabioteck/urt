@@ -16,15 +16,27 @@
             </div>
         @endif
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <a href="{{ route('admin.artists.index') }}" class="group block p-6 bg-black border border-zinc-800 rounded-lg hover:border-red-600 transition">
-                <h2 class="font-mono text-lg font-bold text-white group-hover:text-red-500 mb-2 uppercase tracking-wide">GESTIONE ARTISTI</h2>
-                <p class="font-mono text-xs text-gray-400">Aggiungi, modifica o rimuovi i membri e gli artisti del collettivo U.R.T.</p>
+                <h2 class="font-mono text-base font-bold text-white group-hover:text-red-500 mb-2 uppercase tracking-wide">GESTIONE ARTISTI</h2>
+                <p class="font-mono text-xs text-gray-400">Membri e artisti del collettivo U.R.T.</p>
             </a>
 
             <a href="{{ route('admin.news.index') }}" class="group block p-6 bg-black border border-zinc-800 rounded-lg hover:border-red-600 transition">
-                <h2 class="font-mono text-lg font-bold text-white group-hover:text-red-500 mb-2 uppercase tracking-wide">GESTIONE NEWS</h2>
-                <p class="font-mono text-xs text-gray-400">Pubblica e gestisci comunicati, aggiornamenti e lanci ufficiali.</p>
+                <h2 class="font-mono text-base font-bold text-white group-hover:text-red-500 mb-2 uppercase tracking-wide">GESTIONE NEWS</h2>
+                <p class="font-mono text-xs text-gray-400">Comunicati, aggiornamenti ed eventi.</p>
+            </a>
+
+            @foreach(\App\Models\StaticPage::all() as $page)
+                <a href="{{ route('admin.pages.edit', $page->key) }}" class="group block p-6 bg-black border border-zinc-800 rounded-lg hover:border-red-600 transition">
+                    <h2 class="font-mono text-base font-bold text-white group-hover:text-red-500 mb-2 uppercase tracking-wide">GESTIONE {{ strtoupper($page->title) }}</h2>
+                    <p class="font-mono text-xs text-gray-400">Modifica il contenuto della pagina {{ strtolower($page->title) }}.</p>
+                </a>
+            @endforeach
+
+            <a href="{{ route('admin.stats.index') }}" class="group block p-6 bg-black border border-zinc-800 rounded-lg hover:border-red-600 transition sm:col-span-2 lg:col-span-3">
+                <h2 class="font-mono text-base font-bold text-white group-hover:text-red-500 mb-2 uppercase tracking-wide">STATISTICHE TRAFFICO</h2>
+                <p class="font-mono text-xs text-gray-400">Telemetria, visualizzazioni e grafici in tempo reale.</p>
             </a>
         </div>
 

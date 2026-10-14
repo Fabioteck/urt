@@ -27,10 +27,20 @@ class AdminArtistController extends Controller
             'role' => 'required|string|max:255',
             'bio' => 'required|string',
             'image' => 'nullable|string',
-            'social_links_json' => 'nullable|string',
+            'soundcloud' => 'nullable|url|max:255',
+            'spotify' => 'nullable|url|max:255',
+            'youtube' => 'nullable|url|max:255',
+            'instagram' => 'nullable|url|max:255',
+            'facebook' => 'nullable|url|max:255',
         ]);
 
-        $socialLinks = !empty($validated['social_links_json']) ? json_decode($validated['social_links_json'], true) : null;
+        $socialLinks = array_filter([
+            'soundcloud' => $validated['soundcloud'] ?? null,
+            'spotify' => $validated['spotify'] ?? null,
+            'youtube' => $validated['youtube'] ?? null,
+            'instagram' => $validated['instagram'] ?? null,
+            'facebook' => $validated['facebook'] ?? null,
+        ]);
 
         Artist::create([
             'name' => $validated['name'],
@@ -38,7 +48,7 @@ class AdminArtistController extends Controller
             'role' => $validated['role'],
             'bio' => $validated['bio'],
             'image' => $validated['image'] ?? null,
-            'social_links' => $socialLinks,
+            'social_links' => !empty($socialLinks) ? $socialLinks : null,
         ]);
 
         return redirect()->route('admin.artists.index')->with('success', 'Artista creato con successo.');
@@ -56,10 +66,20 @@ class AdminArtistController extends Controller
             'role' => 'required|string|max:255',
             'bio' => 'required|string',
             'image' => 'nullable|string',
-            'social_links_json' => 'nullable|string',
+            'soundcloud' => 'nullable|url|max:255',
+            'spotify' => 'nullable|url|max:255',
+            'youtube' => 'nullable|url|max:255',
+            'instagram' => 'nullable|url|max:255',
+            'facebook' => 'nullable|url|max:255',
         ]);
 
-        $socialLinks = !empty($validated['social_links_json']) ? json_decode($validated['social_links_json'], true) : null;
+        $socialLinks = array_filter([
+            'soundcloud' => $validated['soundcloud'] ?? null,
+            'spotify' => $validated['spotify'] ?? null,
+            'youtube' => $validated['youtube'] ?? null,
+            'instagram' => $validated['instagram'] ?? null,
+            'facebook' => $validated['facebook'] ?? null,
+        ]);
 
         $artist->update([
             'name' => $validated['name'],
@@ -67,7 +87,7 @@ class AdminArtistController extends Controller
             'role' => $validated['role'],
             'bio' => $validated['bio'],
             'image' => $validated['image'] ?? $artist->image,
-            'social_links' => $socialLinks,
+            'social_links' => !empty($socialLinks) ? $socialLinks : null,
         ]);
 
         return redirect()->route('admin.artists.index')->with('success', 'Artista aggiornato con successo.');

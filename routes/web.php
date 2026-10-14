@@ -4,9 +4,11 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ArtistController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\StaticPageController;
+use App\Http\Controllers\TelemetryController;
 use App\Http\Controllers\Admin\AdminArtistController;
 use App\Http\Controllers\Admin\AdminNewsController;
 use App\Http\Controllers\Admin\AdminPageController;
+use App\Http\Controllers\Admin\AdminStatsController;
 use App\Http\Controllers\Admin\MediaUploadController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +19,7 @@ Route::get('/artisti/{artist}', [ArtistController::class, 'show'])->name('artist
 Route::get('/news', [NewsController::class, 'index'])->name('news.index');
 Route::get('/news/{news}', [NewsController::class, 'show'])->name('news.show');
 Route::get('/pagine/{page}', [StaticPageController::class, 'show'])->name('pages.show');
+Route::post('/telemetry/ping', [TelemetryController::class, 'ping'])->name('telemetry.ping');
 
 // Admin Routes (Breeze Auth & Verified)
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
@@ -24,10 +27,15 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
         return view('admin.dashboard');
     })->name('dashboard');
 
+    Route::get('/stats', [AdminStatsController::class, 'index'])->name('stats.index');
     Route::post('/media/upload', [MediaUploadController::class, 'upload'])->name('media.upload');
     Route::resource('artists', AdminArtistController::class);
     Route::resource('news', AdminNewsController::class);
-    Route::resource('pages', AdminPageController::class)->only(['index', 'edit', 'update']);
+    
+    // RIMOSSO IL VINCOLO ->only(): ORA TUTTI I METODI SONO SBLOCCATI
+    Route::resource('pages', AdminPageController::class);
 });
+
+Route::redirect('/dashboard', '/admin/dashboard')->middleware(['auth', 'verified'])->name('dashboard');
 
 require __DIR__.'/auth.php';

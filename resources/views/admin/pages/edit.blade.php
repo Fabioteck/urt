@@ -18,13 +18,30 @@
             </div>
         @endif
 
-        <form action="{{ route('admin.pages.update', $page) }}" method="POST" id="page-form" class="space-y-4">
+        <form action="{{ route('admin.pages.update', $page) }}" method="POST" id="page-form" class="space-y-6">
             @csrf
             @method('PUT')
 
             <div>
                 <label for="title" class="block font-mono text-xs text-gray-300 uppercase tracking-wider mb-1">Titolo</label>
                 <input type="text" name="title" id="title" value="{{ old('title', $page->title) }}" required class="w-full bg-black border border-zinc-800 rounded text-white font-mono text-sm px-3 py-2 focus:border-red-600 focus:ring-0">
+            </div>
+
+            <div>
+                <label class="block font-mono text-xs text-gray-300 uppercase tracking-wider mb-1">Foto Copertina</label>
+                <input type="hidden" name="image" id="image_path_input" value="{{ old('image', $page->image) }}">
+                <input type="file" id="image_file_ajax" class="hidden" accept="image/*">
+                
+                <div class="flex items-center space-x-4">
+                    <button type="button" id="upload_btn" class="font-mono text-xs bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-2 rounded uppercase border border-zinc-700 transition">
+                        CARICA FOTO COPERTINA
+                    </button>
+                    <span id="upload_status" class="font-mono text-xs text-zinc-400">Nessun file selezionato</span>
+                </div>
+
+                <div id="image_preview_container" class="mt-3 {{ old('image', $page->image) ? '' : 'hidden' }}">
+                    <img id="image_preview" src="{{ old('image', $page->image) ? asset(old('image', $page->image)) : '' }}" alt="Preview" class="w-32 h-20 object-cover rounded border border-zinc-700">
+                </div>
             </div>
 
             <div>
@@ -42,7 +59,41 @@
                 <textarea name="content" id="content" rows="10" required class="w-full bg-black border border-zinc-800 rounded text-white font-mono text-sm p-3 focus:border-red-600 focus:ring-0 hidden">{{ old('content', $page->content) }}</textarea>
             </div>
 
-            <div class="flex justify-end pt-2">
+            <div class="border-t border-zinc-800 pt-6 space-y-4">
+                <h3 class="font-mono text-xs text-red-500 uppercase tracking-widest font-bold">LINK COMMUNITY & CONTATTI DELLA CREW</h3>
+                
+                <div>
+                    <label for="whatsapp_1" class="block font-mono text-xs text-gray-300 uppercase tracking-wider mb-1">Link WhatsApp Community</label>
+                    <input type="url" name="whatsapp_1" id="whatsapp_1" value="{{ old('whatsapp_1', $page->meta_data['whatsapp_1'] ?? '') }}" class="w-full bg-black border border-zinc-800 rounded text-white font-mono text-sm px-3 py-2 focus:border-red-600 focus:ring-0">
+                </div>
+
+                <div>
+                    <label for="whatsapp_2" class="block font-mono text-xs text-gray-300 uppercase tracking-wider mb-1">Link WhatsApp Info</label>
+                    <input type="url" name="whatsapp_2" id="whatsapp_2" value="{{ old('whatsapp_2', $page->meta_data['whatsapp_2'] ?? '') }}" class="w-full bg-black border border-zinc-800 rounded text-white font-mono text-sm px-3 py-2 focus:border-red-600 focus:ring-0">
+                </div>
+
+                <div>
+                    <label for="website" class="block font-mono text-xs text-gray-300 uppercase tracking-wider mb-1">Sito Web Esterno</label>
+                    <input type="url" name="website" id="website" value="{{ old('website', $page->meta_data['website'] ?? '') }}" class="w-full bg-black border border-zinc-800 rounded text-white font-mono text-sm px-3 py-2 focus:border-red-600 focus:ring-0">
+                </div>
+
+                <div>
+                    <label for="instagram" class="block font-mono text-xs text-gray-300 uppercase tracking-wider mb-1">Profilo Instagram</label>
+                    <input type="url" name="instagram" id="instagram" value="{{ old('instagram', $page->meta_data['instagram'] ?? '') }}" class="w-full bg-black border border-zinc-800 rounded text-white font-mono text-sm px-3 py-2 focus:border-red-600 focus:ring-0">
+                </div>
+
+                <div>
+                    <label for="facebook" class="block font-mono text-xs text-gray-300 uppercase tracking-wider mb-1">Pagina Facebook</label>
+                    <input type="url" name="facebook" id="facebook" value="{{ old('facebook', $page->meta_data['facebook'] ?? '') }}" class="w-full bg-black border border-zinc-800 rounded text-white font-mono text-sm px-3 py-2 focus:border-red-600 focus:ring-0">
+                </div>
+
+                <div>
+                    <label for="phone" class="block font-mono text-xs text-gray-300 uppercase tracking-wider mb-1">Telefono</label>
+                    <input type="text" name="phone" id="phone" value="{{ old('phone', $page->meta_data['phone'] ?? '') }}" class="w-full bg-black border border-zinc-800 rounded text-white font-mono text-sm px-3 py-2 focus:border-red-600 focus:ring-0">
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-4">
                 <button type="submit" class="font-mono text-xs bg-red-600 hover:bg-red-700 text-white uppercase px-4 py-2 rounded tracking-wider transition">
                     AGGIORNA PAGINA
                 </button>
@@ -80,7 +131,7 @@
                         ['bold', 'italic', 'underline', 'strike'],
                         ['blockquote', 'code-block'],
                         [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        ['link']
+                        ['link', 'image']
                     ]
                 }
             });
@@ -112,6 +163,51 @@
                 if (!isSourceView) {
                     contentInput.value = quill.root.innerHTML;
                 }
+            });
+
+            // Async Image Upload
+            const uploadBtn = document.getElementById('upload_btn');
+            const fileInput = document.getElementById('image_file_ajax');
+            const pathInput = document.getElementById('image_path_input');
+            const statusSpan = document.getElementById('upload_status');
+            const previewContainer = document.getElementById('image_preview_container');
+            const previewImg = document.getElementById('image_preview');
+
+            uploadBtn.addEventListener('click', function() {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', function() {
+                if (fileInput.files.length === 0) return;
+                const file = fileInput.files[0];
+                const formData = new FormData();
+                formData.append('file', file);
+
+                statusSpan.textContent = 'Caricamento in corso...';
+
+                fetch('{{ route("admin.media.upload") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        pathInput.value = data.path;
+                        previewImg.src = data.url;
+                        previewContainer.classList.remove('hidden');
+                        statusSpan.textContent = 'Caricamento completato!';
+                    } else {
+                        statusSpan.textContent = data.message || 'Errore durante il caricamento.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    statusSpan.textContent = 'Errore di rete.';
+                });
             });
         });
     </script>

@@ -35,8 +35,20 @@
             </div>
 
             <div>
-                <label for="image" class="block font-mono text-xs text-gray-300 uppercase tracking-wider mb-1">Immagine (Path relativo es. img/news.jpg)</label>
-                <input type="text" name="image" id="image" value="{{ old('image', $news->image) }}" class="w-full bg-black border border-zinc-800 rounded text-white font-mono text-sm px-3 py-2 focus:border-red-600 focus:ring-0">
+                <label class="block font-mono text-xs text-gray-300 uppercase tracking-wider mb-1">Immagine Copertina</label>
+                <input type="hidden" name="image" id="image_path_input" value="{{ old('image', $news->image) }}">
+                <input type="file" id="image_file_ajax" class="hidden" accept="image/*">
+                
+                <div class="flex items-center space-x-4">
+                    <button type="button" id="upload_btn" class="font-mono text-xs bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-2 rounded uppercase border border-zinc-700 transition">
+                        CARICA IMMAGINE
+                    </button>
+                    <span id="upload_status" class="font-mono text-xs text-zinc-400">Nessun file selezionato</span>
+                </div>
+
+                <div id="image_preview_container" class="mt-3 {{ old('image', $news->image) ? '' : 'hidden' }}">
+                    <img id="image_preview" src="{{ old('image', $news->image) ? asset(old('image', $news->image)) : '' }}" alt="Preview" class="w-32 h-20 object-cover rounded border border-zinc-700">
+                </div>
             </div>
 
             <div>
@@ -51,4 +63,52 @@
             </div>
         </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadBtn = document.getElementById('upload_btn');
+            const fileInput = document.getElementById('image_file_ajax');
+            const pathInput = document.getElementById('image_path_input');
+            const statusSpan = document.getElementById('upload_status');
+            const previewContainer = document.getElementById('image_preview_container');
+            const previewImg = document.getElementById('image_preview');
+
+            uploadBtn.addEventListener('click', function() {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', function() {
+                if (fileInput.files.length === 0) return;
+                const file = fileInput.files[0];
+                const formData = new FormData();
+                formData.append('file', file);
+
+                statusSpan.textContent = 'Caricamento in corso...';
+
+                fetch('{{ route("admin.media.upload") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        pathInput.value = data.path;
+                        previewImg.src = data.url;
+                        previewContainer.classList.remove('hidden');
+                        statusSpan.textContent = 'Caricamento completato!';
+                    } else {
+                        statusSpan.textContent = data.message || 'Errore durante il caricamento.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    statusSpan.textContent = 'Errore di rete.';
+                });
+            });
+        });
+    </script>
 </x-guest-layout>

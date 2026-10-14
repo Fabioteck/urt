@@ -13,6 +13,12 @@ class StaticPage extends Model
         'key',
         'title',
         'content',
+        'image',
+        'meta_data',
+    ];
+
+    protected $casts = [
+        'meta_data' => 'array',
     ];
 
     public function getRouteKeyName(): string
